@@ -1,7 +1,7 @@
 
 # ⠿ DAB - Draw & Animate Braille
 
-A visual editor for Unicode Braille patterns with frame-by-frame animation, a video-editor-style timeline, and multi-format code export. Think After Effects — but for braille pixel art.
+A visual editor for Unicode Braille patterns with frame-by-frame animation, a video-editor-style timeline, and multi-format code export. Think After Effects, but for braille pixel art.
 
 Draw on a dot grid. Each braille character is a 2×4 dot matrix. The app converts your drawings to Unicode braille characters (U+2800–U+28FF) in real-time, with export formats ready for CLI apps, terminals, READMEs, and code.
 
@@ -121,20 +121,9 @@ README.md     This file
 
 ---
 
-## Design
-
-Dark, monospace-dominant, monochromatic. No colored accents — the palette is black, gray, and white. Built for focus.
-
-- **Background**: `#0a0a0a` → `#111` → `#1a1a1a`
-- **Text**: `#e5e5e5` primary, `#555` secondary
-- **Dots**: 26px circles, glow on active (`box-shadow: 0 0 6px rgba(255,255,255,0.12)`)
-- **Typography**: SF Mono / Cascadia Code / Fira Code / JetBrains Mono
-
----
-
----
-
 Built with [Command Code](https://commandcode.ai)
+
+---
 
 ## License
 
