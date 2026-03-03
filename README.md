@@ -138,4 +138,4 @@ Built with [Command Code](https://commandcode.ai)
 
 ## License
 
-MIT
+MIT © [Obaid Nadeem](https://github.com/ObaidNadeem)
