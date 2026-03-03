@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DAB - Draw & Animate Braille</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Workspace -->
+    <div class="workspace-body">
+      <!-- Canvas Area -->
+      <div class="canvas-area">
+        <div class="grid-label" id="grid-label">4 × 4 pixels — 2 chars</div>
+        <div class="dot-grid-container">
+          <div class="dot-grid" id="dot-grid"></div>
+        </div>
+        <!-- Floating Toolbar -->
+        <div class="floating-toolbar">
+          <span class="toolbar-label">Cells</span>
+          <select id="cell-cols" aria-label="Columns">
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="8">8</option>
+            <option value="10">10</option>
+          </select>
+          <span class="toolbar-x">×</span>
+          <select id="cell-rows" aria-label="Rows">
+            <option value="1" selected>1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+          </select>
+          <div class="sep"></div>
+          <div class="mode-toggle" role="group" aria-label="Drawing mode">
+            <button class="mode-btn active" data-mode="draw">Draw</button>
+            <button class="mode-btn" data-mode="erase">Erase</button>
+          </div>
+          <div class="sep"></div>
+          <button class="tool-btn" id="btn-fill">Fill</button>
+          <button class="tool-btn" id="btn-invert">Invert</button>
+          <button class="tool-btn" id="btn-clear">Clear</button>
+          <div class="sep"></div>
+          <button class="tool-btn" id="btn-new-frame">+ New</button>
+          <button class="tool-btn" id="btn-dup-frame">Dup</button>
+          <button class="tool-btn" id="btn-del-frame">Del</button>
+          <div class="sep"></div>
+          <button class="tool-btn nav-btn" id="btn-prev-frame" aria-label="Previous frame">◁</button>
+          <button class="tool-btn nav-btn" id="btn-next-frame" aria-label="Next frame">▷</button>
+        </div>
+      </div>
+
+      <!-- Output Sidebar -->
+      <div class="output-sidebar">
+        <div class="sidebar-scroll">
+          <div class="output-section">
+            <div class="section-header"><span>Braille</span><button class="copy-btn" data-target="out-braille">Copy</button></div>
+            <pre class="output-content braille-output" id="out-braille"></pre>
+          </div>
+          <div class="output-section">
+            <div class="section-header"><span>Unicode</span><button class="copy-btn" data-target="out-unicode">Copy</button></div>
+            <pre class="output-content" id="out-unicode"></pre>
+          </div>
+          <div class="output-section">
+            <div class="section-header"><span>ASCII</span><button class="copy-btn" data-target="out-ascii">Copy</button></div>
+            <pre class="output-content" id="out-ascii"></pre>
+          </div>
+          <div class="output-section">
+            <div class="section-header"><span>Termdot</span><button class="copy-btn" data-target="out-termdot">Copy</button></div>
+            <pre class="output-content" id="out-termdot"></pre>
+          </div>
+          <div class="output-section">
+            <div class="section-header"><span>JS</span><button class="copy-btn" data-target="out-js">Copy</button></div>
+            <pre class="output-content" id="out-js"></pre>
+          </div>
+          <div class="output-section">
+            <div class="section-header">
+              <span>Animation</span>
+              <div class="section-header-right">
+                <select id="anim-format" aria-label="Animation format">
+                  <option value="js-braille">JS Braille</option>
+                  <option value="js-termdot">JS Termdot</option>
+                  <option value="js-grid">JS Grid</option>
+                  <option value="json">JSON</option>
+                  <option value="python">Python</option>
+                  <option value="rust">Rust</option>
+                  <option value="c">C</option>
+                </select>
+                <button class="copy-btn" data-target="out-animation">Copy</button>
+              </div>
+            </div>
+            <pre class="output-content" id="out-animation"></pre>
+          </div>
+
+          <!-- Shortcuts -->
+          <div class="output-section">
+            <div class="section-header"><span>Shortcuts</span></div>
+            <div class="shortcuts-grid">
+              <div class="shortcut-col">
+                <div class="shortcut-row"><kbd>D</kbd><span>Draw</span></div>
+                <div class="shortcut-row"><kbd>E</kbd><span>Erase</span></div>
+                <div class="shortcut-row"><kbd>C</kbd><span>Clear</span></div>
+                <div class="shortcut-row"><kbd>F</kbd><span>Fill</span></div>
+                <div class="shortcut-row"><kbd>I</kbd><span>Invert</span></div>
+                <div class="shortcut-row"><kbd>L</kbd><span>Line</span></div>
+                <div class="shortcut-row"><kbd>R</kbd><span>Rectangle</span></div>
+                <div class="shortcut-row"><kbd>G</kbd><span>Guides</span></div>
+              </div>
+              <div class="shortcut-col">
+                <div class="shortcut-row"><kbd>N</kbd><span>New frame</span></div>
+                <div class="shortcut-row"><kbd>Space</kbd><span>Play</span></div>
+                <div class="shortcut-row"><kbd>←</kbd><span>Prev frame</span></div>
+                <div class="shortcut-row"><kbd>→</kbd><span>Next frame</span></div>
+                <div class="shortcut-row"><kbd>Shift</kbd><span>Erase dot</span></div>
+                <div class="shortcut-row"><kbd>M</kbd><span>Mirror</span></div>
+                <div class="shortcut-row"><kbd>⌘Z</kbd><span>Undo</span></div>
+                <div class="shortcut-row"><kbd>⌘K</kbd><span>Commands</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tips -->
+          <div class="output-section">
+            <div class="section-header"><span>Tips</span></div>
+            <div class="tips-content">
+              <div class="tip">› Enable <strong>Onion</strong> to ghost the previous frame while drawing — helps with smooth animations.</div>
+              <div class="tip">› Use <strong>Dup</strong> to duplicate a frame, then edit the copy for incremental changes.</div>
+              <div class="tip">› Hold <strong>Shift + click</strong> to erase individual dots regardless of mode.</div>
+              <div class="tip">› Drag across dots to paint or erase in one stroke.</div>
+              <div class="tip">› Use the <strong>Animation</strong> export to get frame arrays ready for your CLI code.</div>
+            </div>
+          </div>
+
+          <!-- Branding -->
+          <div class="sidebar-footer">
+            <div class="brand-name">DAB</div>
+            <div class="brand-tagline">Draw & Animate Braille</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timeline Dock -->
+    <div class="timeline-dock">
+      <div class="transport-bar">
+        <button class="transport-btn" id="btn-prev" aria-label="Previous frame">◁</button>
+        <button class="transport-btn play-btn" id="btn-play" aria-label="Play">▶ Play</button>
+        <button class="transport-btn" id="btn-next" aria-label="Next frame">▷</button>
+        <div class="sep"></div>
+        <span class="frame-counter" id="frame-counter" aria-live="polite">1 / 1</span>
+        <div class="sep"></div>
+        <span class="fps-label">FPS</span>
+        <input type="range" id="fps-slider" min="1" max="24" value="4" aria-label="Frames per second">
+        <span class="fps-value" id="fps-value">4</span>
+        <div class="sep"></div>
+        <button class="transport-btn toggle-btn active" id="btn-loop">Loop</button>
+        <button class="transport-btn toggle-btn" id="btn-onion">Onion</button>
+        <div class="spacer"></div>
+        <button class="tool-btn" id="btn-import">Import</button>
+        <button class="tool-btn" id="btn-save">Save</button>
+        <button class="tool-btn" id="btn-load">Load</button>
+      </div>
+      <div class="frame-strip-row">
+        <div class="frame-strip" id="frame-strip"></div>
+        <span class="built-with">Built with <a href="https://commandcode.ai" target="_blank" rel="noopener noreferrer">Command Code</a></span>
+      </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div class="modal-overlay" id="import-modal">
+      <div class="modal">
+        <div class="modal-title">Import Animation</div>
+        <div class="modal-body">
+          <label class="modal-label">Paste animation data or upload a file:</label>
+          <textarea id="import-textarea" rows="8" placeholder="Paste JSON, JS array, raw braille text, or grid arrays..."></textarea>
+          <div class="import-file-row">
+            <span>Or:</span>
+            <button class="tool-btn" id="import-file-btn">Choose File</button>
+            <input type="file" id="import-file-input" accept=".json,.js,.txt" hidden>
+            <span class="file-types">.json, .js, .txt</span>
+          </div>
+          <div class="import-info" id="import-info"></div>
+          <div class="import-mode">
+            <label><input type="radio" name="import-mode" value="replace"> Replace all frames</label>
+            <label><input type="radio" name="import-mode" value="append" checked> Append to existing</label>
+          </div>
+          <div class="import-error" id="import-error"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="tool-btn" id="import-cancel">Cancel</button>
+          <button class="tool-btn import-confirm" id="import-confirm" disabled>Import</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Command Palette -->
+    <div class="modal-overlay" id="command-palette">
+      <div class="modal palette-modal">
+        <input type="text" id="palette-search" placeholder="Type a command..." autocomplete="off">
+        <div class="palette-list" id="palette-list"></div>
+      </div>
+    </div>
+
+    <!-- Confirm Dialog -->
+    <div class="modal-overlay" id="confirm-dialog">
+      <div class="modal confirm-modal">
+        <div class="modal-title" id="confirm-title"></div>
+        <div class="modal-body" id="confirm-message"></div>
+        <div class="modal-footer">
+          <button class="tool-btn" id="confirm-cancel">Cancel</button>
+          <button class="tool-btn" id="confirm-ok">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
