@@ -6,7 +6,7 @@ A visual editor for Unicode Braille patterns with frame-by-frame animation, a vi
 Draw on a dot grid. Each braille character is a 2×4 dot matrix. The app converts your drawings to Unicode braille characters (U+2800–U+28FF) in real-time, with export formats ready for CLI apps, terminals, READMEs, and code.
 
 ```
-⣿⣷⣾⣽  →  const frames = ["⣿⣷⣾⣽", "⡿⣟⣯⣻"];
+⣿⠇  →  const frames = [ "⠁⠀", "⠃⠀", "⠇⠀", "⡆⠀", "⣄⠀", "⣠⠀" ];Ï
 ```
 
 ---
