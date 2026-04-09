@@ -778,6 +778,9 @@ function setMode(m) {
   });
   state.lineStart = null;
   state.rectStart = null;
+  const gridEl = document.getElementById('dot-grid');
+  if (m === 'draw' || m === 'erase') gridEl.dataset.cursor = m;
+  else delete gridEl.dataset.cursor;
 }
 
 function cycleMirror() {
@@ -842,15 +845,12 @@ function setupGridEvents() {
     }
 
     state.isPointerDown = true;
+    state._lastR = r;
+    state._lastC = c;
+    gridEl.setPointerCapture(e.pointerId);
+    gridEl.classList.add('pressing');
     pushUndo();
-    // Shift always erases. Erase mode always erases.
-    // Draw mode: toggle — if dot is on, turn off; if off, turn on.
-    let val;
-    if (e.shiftKey || state.mode === 'erase') {
-      val = 0;
-    } else {
-      val = grid[r][c] ? 0 : 1;
-    }
+    const val = (e.shiftKey || state.mode === 'erase') ? 0 : 1;
     state.paintVal = val;
     getMirrorPoints(r, c, pixelRows(), pixelCols(), state.mirrorMode).forEach(([mr, mc]) => {
       if (mr >= 0 && mr < grid.length && mc >= 0 && mc < grid[0].length) grid[mr][mc] = val;
@@ -858,22 +858,35 @@ function setupGridEvents() {
     renderAll();
   });
 
-  gridEl.addEventListener('pointerover', (e) => {
+  gridEl.addEventListener('pointermove', (e) => {
     if (!state.isPointerDown) return;
-    const dot = e.target.closest('.dot');
+    const dot = document.elementFromPoint(e.clientX, e.clientY)?.closest('.dot');
     if (!dot) return;
     const r = parseInt(dot.dataset.r);
     const c = parseInt(dot.dataset.c);
+    if (state._lastR === r && state._lastC === c) return;
+    state._lastR = r;
+    state._lastC = c;
     const grid = currentGrid();
     const val = state.paintVal;
     getMirrorPoints(r, c, pixelRows(), pixelCols(), state.mirrorMode).forEach(([mr, mc]) => {
       if (mr >= 0 && mr < grid.length && mc >= 0 && mc < grid[0].length) grid[mr][mc] = val;
     });
     renderAll();
-  }, true);
+  });
+
+  gridEl.addEventListener('lostpointercapture', () => {
+    state.isPointerDown = false;
+    state._lastR = -1;
+    state._lastC = -1;
+    gridEl.classList.remove('pressing');
+  });
 
   document.addEventListener('pointerup', () => {
     state.isPointerDown = false;
+    state._lastR = -1;
+    state._lastC = -1;
+    gridEl.classList.remove('pressing');
   });
 }
 
@@ -963,6 +976,7 @@ function init() {
 
   setupGridEvents();
   setupShortcuts();
+  document.getElementById('dot-grid').dataset.cursor = state.mode === 'draw' || state.mode === 'erase' ? state.mode : '';
 
   // Grid size selects
   document.getElementById('cell-cols').addEventListener('change', (e) => resizeGrid(parseInt(e.target.value), state.cellRows));

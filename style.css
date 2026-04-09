@@ -114,13 +114,33 @@ body {
   touch-action: none;
 }
 
+.dot-grid[data-cursor="draw"],
+.dot-grid[data-cursor="draw"] .dot {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20l2-6L17 3l3 3L9 17z' stroke='%230a0a0a' stroke-width='4'/%3E%3Cpath d='M14 6l3 3' stroke='%230a0a0a' stroke-width='4'/%3E%3Cpath d='M4 20l2-6L17 3l3 3L9 17z' stroke='%23e5e5e5' stroke-width='1.5'/%3E%3Cpath d='M14 6l3 3' stroke='%23e5e5e5' stroke-width='1.5'/%3E%3C/svg%3E") 4 20, crosshair;
+}
+
+.dot-grid[data-cursor="draw"].pressing,
+.dot-grid[data-cursor="draw"].pressing .dot {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20l2-5L16 5l3 3L9 18z' stroke='%230a0a0a' stroke-width='5'/%3E%3Cpath d='M14 7l3 3' stroke='%230a0a0a' stroke-width='5'/%3E%3Cpath d='M4 20l2-5L16 5l3 3L9 18z' stroke='%23e5e5e5' stroke-width='2'/%3E%3Cpath d='M14 7l3 3' stroke='%23e5e5e5' stroke-width='2'/%3E%3C/svg%3E") 4 20, crosshair;
+}
+
+.dot-grid[data-cursor="erase"],
+.dot-grid[data-cursor="erase"] .dot {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 20H7l-3-3 9-9 6 6-3 3' stroke='%230a0a0a' stroke-width='4'/%3E%3Cpath d='M13 8l6 6' stroke='%230a0a0a' stroke-width='4'/%3E%3Cpath d='M20 20H7l-3-3 9-9 6 6-3 3' stroke='%23e5e5e5' stroke-width='1.5'/%3E%3Cpath d='M13 8l6 6' stroke='%23e5e5e5' stroke-width='1.5'/%3E%3C/svg%3E") 4 20, crosshair;
+}
+
+.dot-grid[data-cursor="erase"].pressing,
+.dot-grid[data-cursor="erase"].pressing .dot {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 20H8l-3-2 8-8 5 5-2 2' stroke='%230a0a0a' stroke-width='5'/%3E%3Cpath d='M13 10l5 5' stroke='%230a0a0a' stroke-width='5'/%3E%3Cpath d='M20 20H8l-3-2 8-8 5 5-2 2' stroke='%23e5e5e5' stroke-width='2'/%3E%3Cpath d='M13 10l5 5' stroke='%23e5e5e5' stroke-width='2'/%3E%3C/svg%3E") 4 20, crosshair;
+}
+
 .dot {
   width: 26px;
   height: 26px;
   border-radius: 50%;
   background: var(--dot-off);
   margin: 2px;
-  cursor: pointer;
+  cursor: crosshair;
   transition: background 0.08s ease, transform 0.08s ease, box-shadow 0.08s ease;
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
   flex-shrink: 0;
