@@ -65,18 +65,19 @@ function gridToJs(grid, cellCols, cellRows) {
 
 // ===== ANIMATION EXPORT =====
 function exportAnimation(frames, cellCols, cellRows, format) {
-  const allBraille = frames.map(f => gridToBraille(f, cellCols, cellRows));
+  const exportFrames = state.bounce ? [...frames, ...[...frames].reverse()] : frames;
+  const allBraille = exportFrames.map(f => gridToBraille(f, cellCols, cellRows));
   switch (format) {
     case 'js-braille': {
       const items = allBraille.map(lines => lines.length === 1 ? '"' + lines[0] + '"' : '[' + lines.map(l => '"' + l + '"').join(', ') + ']');
       return 'const frames = [\n' + items.map(i => '  ' + i).join(',\n') + '\n];';
     }
     case 'js-termdot': {
-      const items = frames.map(f => '"' + f.map(row => row.map(v => v ? '*' : '.').join('')).join('\\n') + '"');
+      const items = exportFrames.map(f => '"' + f.map(row => row.map(v => v ? '*' : '.').join('')).join('\\n') + '"');
       return 'const frames = [\n' + items.map(i => '  ' + i).join(',\n') + '\n];';
     }
     case 'js-grid':
-      return 'const frames = ' + JSON.stringify(frames, null, 2) + ';';
+      return 'const frames = ' + JSON.stringify(exportFrames, null, 2) + ';';
     case 'json':
       return JSON.stringify({ cols: cellCols, rows: cellRows, fps: state.fps, frames: allBraille }, null, 2);
     case 'python': {
@@ -244,6 +245,8 @@ const state = {
   isPlaying: false,
   fps: 4,
   loop: true,
+  bounce: false,
+  playDirection: 1,
   onionSkin: false,
   undoStack: [],
   redoStack: [],
@@ -320,6 +323,7 @@ function scheduleSave() {
         currentFrame: state.currentFrame,
         fps: state.fps,
         loop: state.loop,
+        bounce: state.bounce,
       }));
     } catch (e) {}
   }, 500);
@@ -337,11 +341,13 @@ function loadSaved() {
       state.currentFrame = Math.min(data.currentFrame || 0, data.frames.length - 1);
       state.fps = data.fps || 4;
       state.loop = data.loop !== false;
+      state.bounce = data.bounce === true;
       document.getElementById('cell-cols').value = state.cellCols;
       document.getElementById('cell-rows').value = state.cellRows;
       document.getElementById('fps-slider').value = state.fps;
       document.getElementById('fps-value').textContent = state.fps;
       if (state.loop) document.getElementById('btn-loop').classList.add('active');
+      if (state.bounce) document.getElementById('btn-bounce').classList.add('active');
     }
   } catch (e) {}
 }
@@ -530,10 +536,15 @@ function clearGrid() {
 function startPlayback() {
   if (state.frames.length <= 1) return;
   state.isPlaying = true;
+  state.playDirection = 1;
   document.getElementById('btn-play').textContent = '⏸ Pause';
   state.playIntervalId = setInterval(() => {
-    if (state.currentFrame < state.frames.length - 1) {
-      state.currentFrame++;
+    const next = state.currentFrame + state.playDirection;
+    if (next >= 0 && next < state.frames.length) {
+      state.currentFrame = next;
+    } else if (state.bounce) {
+      state.playDirection *= -1;
+      state.currentFrame += state.playDirection;
     } else if (state.loop) {
       state.currentFrame = 0;
     } else {
@@ -582,6 +593,7 @@ function saveProject() {
     cellRows: state.cellRows,
     fps: state.fps,
     loop: state.loop,
+    bounce: state.bounce,
     frames: state.frames,
   }, null, 2);
   const blob = new Blob([data], { type: 'application/json' });
@@ -612,6 +624,7 @@ function loadProject() {
           state.currentFrame = 0;
           state.fps = data.fps || 4;
           state.loop = data.loop !== false;
+          state.bounce = data.bounce === true;
           document.getElementById('cell-cols').value = state.cellCols;
           document.getElementById('cell-rows').value = state.cellRows;
           document.getElementById('fps-slider').value = state.fps;
@@ -645,6 +658,8 @@ const commands = [
   { label: 'Next frame', shortcut: '→', action: () => { if (state.currentFrame < state.frames.length - 1) { state.currentFrame++; renderAll(); } } },
   { label: 'Toggle guides', shortcut: 'G', action: () => { state.showGuides = !state.showGuides; renderGrid(); } },
   { label: 'Cycle mirror', shortcut: 'M', action: cycleMirror },
+  { label: 'Toggle loop', shortcut: '', action: () => { state.loop = !state.loop; if (state.loop) { state.bounce = false; state.playDirection = 1; document.getElementById('btn-bounce').classList.remove('active'); } document.getElementById('btn-loop').classList.toggle('active', state.loop); } },
+  { label: 'Toggle bounce', shortcut: '', action: () => { state.bounce = !state.bounce; if (state.bounce) { state.loop = false; document.getElementById('btn-loop').classList.remove('active'); } else { state.playDirection = 1; } document.getElementById('btn-bounce').classList.toggle('active', state.bounce); } },
   { label: 'Undo', shortcut: '⌘Z', action: undo },
   { label: 'Redo', shortcut: '⌘⇧Z', action: redo },
   { label: 'Save project', shortcut: '⌘S', action: saveProject },
@@ -1012,7 +1027,24 @@ function init() {
   // Toggles
   document.getElementById('btn-loop').addEventListener('click', () => {
     state.loop = !state.loop;
+    if (state.loop) {
+      state.bounce = false;
+      state.playDirection = 1;
+      document.getElementById('btn-bounce').classList.remove('active');
+    }
     document.getElementById('btn-loop').classList.toggle('active', state.loop);
+    renderOutputs();
+  });
+  document.getElementById('btn-bounce').addEventListener('click', () => {
+    state.bounce = !state.bounce;
+    if (state.bounce) {
+      state.loop = false;
+      document.getElementById('btn-loop').classList.remove('active');
+    } else {
+      state.playDirection = 1;
+    }
+    document.getElementById('btn-bounce').classList.toggle('active', state.bounce);
+    renderOutputs();
   });
   document.getElementById('btn-onion').addEventListener('click', () => {
     state.onionSkin = !state.onionSkin;
